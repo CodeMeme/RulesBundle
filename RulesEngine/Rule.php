@@ -106,18 +106,19 @@ class Rule
         
         $targeted = array();
         
-        foreach ($this->getConditions() as $path => $expected) {
+        $passed = $this->getConditions()->forAll(function ($path, $expected) use (&$targeted, $aliases) {
             foreach ($aliases as $alias) {
                 $path = new PropertyPath($path);
                 $actual = $path->getValue($alias);
                 
                 if ($actual === $expected) {
                     $targeted[] = current($alias);
+                    return true;
                 }
             }
-        }
+        });
         
-        return $targeted;
+        return $passed ? $targeted : array();
     }
 
     private function alias($targets)
