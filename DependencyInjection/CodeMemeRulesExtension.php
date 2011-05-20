@@ -22,6 +22,12 @@ class CodeMemeRulesExtension extends Extension
         $engine = $container->getDefinition('rules.engine');
         
         foreach ($configs as $config) {
+            if (isset($config['aliases'])) {
+                foreach ($config['aliases'] as $alias => $value) {
+                    $engine->addMethodCall('setAlias', array($alias, $value));
+                }
+            }
+            
             if (isset($config['rules'])) {
                 foreach ($config['rules'] as $name => $ruleConfig) {
                     $rule = new Definition('%rules.rule.class%');
@@ -34,10 +40,6 @@ class CodeMemeRulesExtension extends Extension
                     
                     foreach ($ruleConfig['then'] as $path => $value) {
                         $rule->addMethodCall('setAction', array($path, $value));
-                    }
-                    
-                    if (isset($config['aliases'])) {
-                        $rule->addMethodCall('setAliases', array($config['aliases']));
                     }
                     
                     // How the heck can I pass the definition itself, rather than a reference?

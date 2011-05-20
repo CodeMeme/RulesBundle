@@ -18,6 +18,7 @@ class Rule
 
     public function __construct()
     {
+        $this->aliases    = new ArrayCollection;
         $this->conditions = new ArrayCollection;
         $this->actions    = new ArrayCollection;
     }
@@ -82,8 +83,8 @@ class Rule
 
     public function evaluate($targets)
     {
-        if ($targeted = $this->supports($targets)) {
-            $this->modify($targeted);
+        if ($supported = $this->supports($targets)) {
+            $this->modify($supported);
         }
     }
 
@@ -91,34 +92,64 @@ class Rule
     {
         $aliases = $this->alias($targets);
         
-        $this->getActions()->forAll(function($path, $value) use ($aliases) {
-            foreach ($aliases as $alias) {
-                $path = new PropertyPath($path);
-                $path->setValue($alias, $value);
+        foreach ($this->getActions() as $path => $value) {
+            foreach ($aliases as $pair) {
+                foreach ($pair as $alias => $target) {
+                    $path = new PropertyPath($path);
+                    
+                    if ($path->getElement(0) === $alias) {
+                        $path->setValue($pair, $value);
+                    }
+                }
             }
-        });
-        
+        }
     }
 
     public function supports($targets)
     {
         $aliases = $this->alias($targets);
         
-        $targeted = array();
+        $passed = array();
+        $failed = array();
         
-        $passed = $this->getConditions()->forAll(function ($path, $expected) use (&$targeted, $aliases) {
-            foreach ($aliases as $alias) {
-                $path = new PropertyPath($path);
-                $actual = $path->getValue($alias);
-                
-                if ($actual === $expected) {
-                    $targeted[] = current($alias);
-                    return true;
+        $supported = $this->getConditions()->forAll(function ($path, $expected) use ($aliases, &$passed, &$failed) {
+            // Example: array(array( 'form' => $form ), array( 'lead' => $lead ))
+            foreach ($aliases as $pair) {
+                // Example: array( 'form' => $form )
+                foreach ($pair as $alias => $target) {
+                    //  Example: lead.program.id
+                    $path   = new PropertyPath($path);
+                    $actual = $path->getValue($pair);
+                    
+                    // Only test targets that are aliased to the initial path ('form' => 'form.field.value')
+                    if ($path->getElement(0) === $alias) {
+                        if ($actual === $expected) {
+                            if (! in_array($target, $passed)) {
+                                $passed[] = $target;
+                            }
+                            
+                            return true;
+                        } else {
+                            if (! in_array($target, $failed)) {
+                                $failed[] = $target;
+                            }
+                        }
+                    } else {
+                        // Otherwise, continue to next alias + target pair
+                        continue;
+                    }
                 }
             }
         });
         
-        return $passed ? $targeted : array();
+        // Find any targets that neither failed nor passed & add them to the passed array
+        foreach ($targets as $target) {
+            if (! in_array($target, $failed) && ! in_array($target, $passed)) {
+                $passed[] = $target;
+            }
+        }
+        
+        return $supported ? $passed : array();
     }
 
     private function alias($targets)
