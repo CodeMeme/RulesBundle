@@ -4,6 +4,7 @@ namespace CodeMeme\RulesBundle\RulesEngine;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class Rule
 {
@@ -119,7 +120,13 @@ class Rule
                 foreach ($pair as $alias => $target) {
                     //  Example: lead.program.id
                     $path   = new PropertyPath($path);
-                    $actual = $path->getValue($pair);
+                    
+                    try {
+                        // Only fully-fleshed objects are parsable
+                        $actual = $path->getValue($pair);
+                    } catch (UnexpectedTypeException $e) {
+                        continue;
+                    }
                     
                     // Only test targets that are aliased to the initial path ('form' => 'form.field.value')
                     if ($path->getElement(0) === $alias) {
