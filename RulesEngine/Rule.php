@@ -149,7 +149,15 @@ class Rule
                                 case 'equals':
                                     $allPassed = ($actual === $value);
                                     break;
-                                default: throw new Exception("Bad conditional '$conditional'");
+                                case 'in':
+                                    $value = is_array($value) ? $value : array($value);
+                                    $allPassed = in_array($actual, $value, true);
+                                    break;
+                                case 'notIn':
+                                    $value = is_array($value) ? $value : array($value);
+                                    $allPassed = !in_array($actual, $value, true);
+                                    break;
+                                default: throw new \Exception("Bad conditional '$conditional'");
                             }
                             // Short-circuit the foreach once any condition fails
                             if (!$allPassed) {
