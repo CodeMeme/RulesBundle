@@ -130,7 +130,34 @@ class Rule
                     
                     // Only test targets that are aliased to the initial path ('form' => 'form.field.value')
                     if ($path->getElement(0) === $alias) {
-                        if ($actual === $expected) {
+                        
+                        // Convert foo.bar: "baz" -> foo.bar: { 'equals': "baz" }
+                        if (is_scalar($expected)) {
+                            $expected = array('equals' => $expected);
+                        }
+                        
+                        $allPassed = TRUE;
+                        
+                        foreach ($expected as $conditional => $value) {
+                            switch ($conditional) {
+                                case 'greaterThan':
+                                    $allPassed = ($actual > $value);
+                                    break;
+                                case 'lessThan':
+                                    $allPassed = ($actual < $value);
+                                    break;
+                                case 'equals':
+                                    $allPassed = ($actual === $value);
+                                    break;
+                                default: throw new Exception("Bad conditional '$conditional'");
+                            }
+                            // Short-circuit the foreach once any condition fails
+                            if (!$allPassed) {
+                                break;
+                            }
+                        }
+                        
+                        if ($allPassed) {
                             if (! in_array($target, $passed)) {
                                 $passed[] = $target;
                             }
