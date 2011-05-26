@@ -147,7 +147,7 @@ class Rule
                                     $allPassed = ($actual < $value);
                                     break;
                                 case 'equals':
-                                    $allPassed = ($actual === $value);
+                                    $allPassed = ($actual == $value);
                                     break;
                                 case 'in':
                                     $value = is_array($value) ? $value : array($value);
