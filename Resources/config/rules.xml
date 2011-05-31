@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="rules.engine_factory.class">CodeMeme\RulesBundle\RulesEngineFactory</parameter>
+        <parameter key="rules.rule_factory.class">CodeMeme\RulesBundle\RuleFactory</parameter>
+        
+        <parameter key="rules.engine.class">CodeMeme\RulesBundle\RulesEngine</parameter>
+        <parameter key="rules.rule.class">CodeMeme\RulesBundle\Rule</parameter>
+    </parameters>
+
+    <services>
+        <service id="rules.engine_factory" class="%rules.engine_factory.class%" />
+        <service id="rules.rule_factory"   class="%rules.rule_factory.class%" />
+        
+        <service id="rules.engine" class="%rules.engine.class%" factory-service="rules.engine_factory" factory-method="createEngine" />
+        <service id="rules.rule"   class="%rules.rule.class%"   factory-service="rules.rule_factory"   factory-method="createRule"   abstract="true" />
+        
+        <service id="rules" alias="rules.engine" />
+    </services>
+</container>

@@ -46,6 +46,13 @@ class RulesEngine
         $this->getRules()->add($rule);
     }
 
+    public function addRules($rules)
+    {
+        foreach ($rules as $rule) {
+            $this->addRule($rule);
+        }
+    }
+
     public function getRules()
     {
         return $this->rules;
