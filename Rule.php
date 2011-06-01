@@ -87,6 +87,8 @@ class Rule
         if ($supported = $this->supports($targets)) {
             $this->modify($supported);
         }
+        
+        return (Boolean) $supported;
     }
 
     public function modify($targets)
