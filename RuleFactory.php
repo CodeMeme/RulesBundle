@@ -14,10 +14,18 @@ class RuleFactory
         
         $factory = new BehaviorFactory;
         
+        if (! $conditions) {
+            throw new \InvalidArgumentException('Rule conditions must be iterable');
+        }
+        
         foreach ($conditions as $condition => $values) {
             $rule->getConditions()->add(
                 $factory->createBehavior($condition, $values)
             );
+        }
+        
+        if (! $actions) {
+            throw new \InvalidArgumentException('Rule actions must be iterable');
         }
         
         foreach ($actions as $action => $values) {
