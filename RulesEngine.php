@@ -11,10 +11,13 @@ class RulesEngine
 
     private $rules;
 
+    private $targets;
+
     public function __construct($rules = array())
     {
         $this->aliases  = new ArrayCollection;
         $this->rules    = new ArrayCollection;
+        $this->targets  = new ArrayCollection;
     }
 
     public function setAlias($alias, $value)
@@ -65,8 +68,36 @@ class RulesEngine
         return $this;
     }
 
-    public function evaluate($targets)
+    public function addTarget($target)
     {
+        $this->getTargets()->add($target);
+    }
+
+    public function addTargets($targets)
+    {
+        foreach ($targets as $target) {
+            $this->addTarget($target);
+        }
+    }
+
+    public function getTargets()
+    {
+        return $this->targets;
+    }
+
+    public function setTargets($targets)
+    {
+        $this->targets = $targets;
+        
+        return $this;
+    }
+
+    public function evaluate($targets = array())
+    {
+        foreach ($this->getTargets() as $target) {
+            $targets[] = $target;
+        }
+        
         foreach ($this->getRules() as $rule) {
             $rule->evaluate($targets);
         }
