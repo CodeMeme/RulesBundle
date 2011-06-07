@@ -3,7 +3,6 @@
 namespace CodeMeme\RulesBundle;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class Rule

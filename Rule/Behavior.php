@@ -2,8 +2,9 @@
 
 namespace CodeMeme\RulesBundle\Rule;
 
+use CodeMeme\RulesBundle\Util\PropertyPath;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class Behavior
 {
@@ -23,7 +24,11 @@ class Behavior
 
     public function evaluate($target)
     {
-        $actual = $this->path->getValue($target);
+        try {
+            $actual = $this->path->getValue($target);
+        } catch (UnexpectedTypeException $e) {
+            return false;
+        }
         
         return $this->comparators->forAll(function($i, $comparator) use ($actual) {
             return $comparator->compare($actual);
