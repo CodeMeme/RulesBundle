@@ -7,7 +7,7 @@ use CodeMeme\RulesBundle\Rule\BehaviorFactory;
 class RuleFactory
 {
 
-    public function createRule($name, $conditions, $actions)
+    public function createRule($name, $conditions, $actions, $fallbacks = array())
     {
         $rule = new Rule;
         $rule->setName($name);
@@ -34,6 +34,14 @@ class RuleFactory
             );
         }
         
+        if ($fallbacks) {
+            foreach ($fallbacks as $fallback => $values) {
+                $rule->getFallbacks()->add(
+                    $factory->createBehavior($fallback, $values)
+                );
+            }
+        }
+        
         return $rule;
     }
 
@@ -42,7 +50,12 @@ class RuleFactory
         $rules = array();
         
         foreach ($configs as $name => $config) {
-            $rules[] = $this->createRule($name, $config['if'], $config['then']);
+            $rules[] = $this->createRule(
+                $name,
+                $config['if'],
+                $config['then'],
+                isset($config['else']) ? $config['else'] : array()
+            );
         }
         
         return $rules;

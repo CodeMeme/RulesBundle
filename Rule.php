@@ -16,11 +16,14 @@ class Rule
 
     private $actions;
 
+    private $fallbacks;
+
     public function __construct()
     {
         $this->aliases    = new ArrayCollection;
         $this->conditions = new ArrayCollection;
         $this->actions    = new ArrayCollection;
+        $this->fallbacks  = new ArrayCollection;
     }
 
     public function getName()
@@ -81,20 +84,34 @@ class Rule
         return $this;
     }
 
+    public function getFallbacks()
+    {
+        return $this->fallbacks;
+    }
+
+    public function setFallbacks($fallbacks)
+    {
+        $this->fallbacks = $fallbacks;
+        
+        return $this;
+    }
+
     public function evaluate($targets)
     {
         if ($supported = $this->supports($targets)) {
-            $this->modify($supported);
+            $this->modify($supported, $this->getActions());
+        } else {
+            $this->modify($targets, $this->getFallbacks());
         }
         
         return (Boolean) $supported;
     }
 
-    public function modify($targets)
+    public function modify($targets, $actions)
     {
         $aliases = $this->alias($targets);
         
-        foreach ($this->getActions() as $action) {
+        foreach ($actions as $action) {
             foreach ($aliases as $pair) {
                 if ($action->supports($pair)) {
                     $action->modify($pair);
