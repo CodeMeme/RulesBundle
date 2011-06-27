@@ -92,9 +92,7 @@ class PropertyPath extends BasePropertyPath
             $reflClass = new \ReflectionClass($objectOrArray);
             $setter = 'set'.$this->camelize($property);
     
-            if ($reflClass->hasMethod($property)) {
-                $objectOrArray->$property($value);
-            } else if ($reflClass->hasMethod($setter)) {
+            if ($reflClass->hasMethod($setter)) {
                 if (!$reflClass->getMethod($setter)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $setter, $reflClass->getName()));
                 }
@@ -115,6 +113,8 @@ class PropertyPath extends BasePropertyPath
             } else if (property_exists($objectOrArray, $property)) {
                 // needed to support \stdClass instances
                 $objectOrArray->$property = $value;
+            } else if ($reflClass->hasMethod($property)) {
+                $objectOrArray->$property($value);
             } else {
                 throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->getName()));
             }
