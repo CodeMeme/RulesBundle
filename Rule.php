@@ -100,7 +100,7 @@ class Rule
     {
         if ($supported = $this->supports($targets)) {
             $this->modify($supported, $this->getActions());
-        } else {
+        } else if (! $this->getFallbacks()->isEmpty()) {
             $this->modify($targets, $this->getFallbacks());
         }
         
