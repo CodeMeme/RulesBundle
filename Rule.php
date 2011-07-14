@@ -130,14 +130,15 @@ class Rule
             throw new \InvalidArgumentException(sprintf('Rule %s has no actions', $this->getName()));
         }
 
-        $supported   = $this->alias($targets);
-        $unsupported = new ArrayCollection;
+        $aliased     = $this->alias($targets);
+        $supported   = $aliased;
+        $unsupported = $aliased;
 
         // Find targets that match all conditions or none
-        $passed = $this->getConditions()->forAll(function($i, $condition) use (&$supported, &$unsupported) {
-            $supported = $supported->filter(function($target) use ($condition, &$unsupported) {
-                if (! $condition->supports($target)) {
-                    $unsupported->add($target);
+        $passed = $this->getConditions()->forAll(function($i, $condition) use ($aliased, &$supported, &$unsupported) {
+            $supported = $aliased->filter(function($target) use ($condition, &$unsupported) {
+                if ($condition->supports($target)) {
+                    $unsupported->removeElement($target);
                 }
 
                 return $condition->supports($target) && $condition->evaluate($target);
@@ -150,11 +151,9 @@ class Rule
             foreach ($unsupported as $target) {
                 $supported->add($target);
             }
-
-            return $supported;
-        } else {
-            return false;
         }
+
+        return $passed ? $supported : false;
     }
 
     private function alias($targets)

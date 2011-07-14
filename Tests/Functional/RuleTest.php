@@ -119,6 +119,21 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($rule->evaluate(array($person, $store)));
     }
 
+    /**
+     * @dataProvider storeRuleProvider
+     */
+    public function testRuleEvaluatesOnlyMatchingConditions($rule)
+    {
+        $eric   = new Person('Eric');
+        $evan   = new Person('Evan');
+        $store  = new Store('CodeMeme');
+
+        $this->assertTrue(!!$rule->supports(array($eric, $evan, $store)));
+        $this->assertTrue($rule->evaluate(array($eric, $evan, $store)));
+
+        $this->assertEquals('New Store Name', $store->name);
+    }
+
     public function ruleProvider()
     {
         $rule = new Rule(

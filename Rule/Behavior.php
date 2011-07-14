@@ -36,7 +36,7 @@ class Behavior
         } catch (UnexpectedTypeException $e) {
             return false;
         }
-        
+
         return $this->comparators->forAll(function($i, $comparator) use ($actual) {
             return $comparator->compare($actual);
         });
