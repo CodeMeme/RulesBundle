@@ -3,23 +3,30 @@
 namespace CodeMeme\RulesBundle\Rule;
 
 use CodeMeme\RulesBundle\Util\PropertyPath;
+use CodeMeme\RulesBundle\Rule\Comparator\ComparatorInterface;
+
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\InvalidPropertyException;
 
 class Behavior
 {
 
     private $path;
 
+    private $root;
+
     private $comparators;
 
-    public function __construct($path, $comparators = array())
+    public function __construct($path, $comparators)
     {
         $this->path  = is_scalar($path)
                      ? new PropertyPath($path)
                      : $path;
-        
-        $this->comparators = new ArrayCollection($comparators);
+        $this->root  = new PropertyPath($this->path->getElement(0));
+
+        $this->comparators = new ArrayCollection(is_array($comparators) ? $comparators : array($comparators));
     }
 
     public function evaluate($target)
@@ -38,13 +45,26 @@ class Behavior
     public function modify($target)
     {
         foreach ($this->comparators as $comparator) {
-            $this->path->setValue($target, $comparator->getValue());
+            $value = ($comparator instanceof ComparatorInterface)
+                   ? $comparator->getValue()
+                   : $comparator;
+
+            $this->path->setValue($target, $value);
         }
     }
 
     public function supports($target)
     {
-        return $this->path->getElement(0) === current(array_keys($target));
+        if (is_array($target)) {
+            return array_key_exists($this->root->getElement(0), $target);
+        } else {
+            try {
+                $this->root->getValue($target);
+                return true;
+            } catch (InvalidPropertyException $e) {
+                return false;
+            }
+        }
     }
 
 }

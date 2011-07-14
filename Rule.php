@@ -18,12 +18,12 @@ class Rule
 
     private $fallbacks;
 
-    public function __construct()
+    public function __construct($conditions = array(), $actions = array(), $fallbacks = array(), $aliases = array())
     {
-        $this->aliases    = new ArrayCollection;
-        $this->conditions = new ArrayCollection;
-        $this->actions    = new ArrayCollection;
-        $this->fallbacks  = new ArrayCollection;
+        $this->conditions = is_array($conditions)   ? new ArrayCollection($conditions)  : $conditions;
+        $this->actions    = is_array($actions)      ? new ArrayCollection($actions)     : $actions;
+        $this->fallbacks  = is_array($fallbacks)    ? new ArrayCollection($fallbacks)   : $fallbacks;
+        $this->aliases    = is_array($aliases)      ? new ArrayCollection($aliases)     : $aliases;
     }
 
     public function getName()
@@ -62,7 +62,7 @@ class Rule
 
     public function setConditions($conditions)
     {
-        $this->conditions = $conditions;
+        $this->conditions = is_array($conditions) ? new ArrayCollection($conditions) : $conditions;
         
         return $this;
     }
@@ -79,7 +79,7 @@ class Rule
 
     public function setActions($actions)
     {
-        $this->actions = $actions;
+        $this->actions = is_array($actions) ? new ArrayCollection($actions) : $actions;
         
         return $this;
     }
@@ -109,12 +109,10 @@ class Rule
 
     public function modify($targets, $actions)
     {
-        $aliases = $this->alias($targets);
-        
         foreach ($actions as $action) {
-            foreach ($aliases as $pair) {
-                if ($action->supports($pair)) {
-                    $action->modify($pair);
+            foreach ($targets as $target) {
+                if ($action->supports($target)) {
+                    $action->modify($target);
                 }
             }
         }
@@ -122,47 +120,64 @@ class Rule
 
     public function supports($targets)
     {
-        $aliases = $this->alias($targets);
-        
-        $passed = array();
-        $failed = array();
-        
-        $supported = $this->getConditions()->forAll(function ($i, $condition) use ($aliases, &$passed, &$failed) {
-            foreach ($aliases as $pair) {
-                if ($condition->supports($pair)) {
-                    if ($condition->evaluate($pair)) {
-                        $passed += array_values($pair);
-                        return true;
-                    } else {
-                        $failed += array_values($pair);
-                    }
-                }
-            }
-        });
-        
-        // Find any targets that neither failed nor passed & add them to the passed array
-        foreach ($targets as $target) {
-            if (! in_array($target, $failed) && ! in_array($target, $passed)) {
-                $passed[] = $target;
-            }
+        if (!is_array($targets) && !$targets instanceof \IteratorAggregate) {
+            $targets = array($targets);
         }
-        
-        return $supported ? $passed : array();
+
+        if ($this->getConditions()->isEmpty()) {
+            throw new \InvalidArgumentException(sprintf('Rule %s has no conditions', $this->getName()));
+        } else if ($this->getActions()->isEmpty()) {
+            throw new \InvalidArgumentException(sprintf('Rule %s has no actions', $this->getName()));
+        }
+
+        $supported   = $this->alias($targets);
+        $unsupported = new ArrayCollection;
+
+        // Find targets that match all conditions or none
+        $passed = $this->getConditions()->forAll(function($i, $condition) use (&$supported, &$unsupported) {
+            $supported = $supported->filter(function($target) use ($condition, &$unsupported) {
+                if (! $condition->supports($target)) {
+                    $unsupported->add($target);
+                }
+
+                return $condition->supports($target) && $condition->evaluate($target);
+            });
+
+            return !$supported->isEmpty();
+        });
+
+        if ($passed) {
+            foreach ($unsupported as $target) {
+                $supported->add($target);
+            }
+
+            return $supported;
+        } else {
+            return false;
+        }
     }
 
     private function alias($targets)
     {
-        $aliases = array();
-        
+        $aliased = new ArrayCollection;
+
         foreach ($targets as $target) {
-            foreach ($this->aliases as $alias => $expected) {
-                if (null === $expected || $target instanceof $expected) {
-                    $aliases[] = array($alias => $target);
+            $found = false;
+
+            foreach ($this->getAliases() as $alias => $instance) {
+                // Target can match multiple aliases, or an alias that has no specific instance
+                if (null === $instance || $target instanceof $instance) {
+                    $found = true;
+                    $aliased[] = array($alias => $target);
                 }
             }
+
+            if (! $found) {
+                throw new \InvalidArgumentException(sprintf('No alias found for %s', is_object($target) ? get_class($target) : $target));
+            }
         }
-        
-        return $aliases;
+
+        return $aliased;
     }
 
 }
