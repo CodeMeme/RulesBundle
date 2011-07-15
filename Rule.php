@@ -131,12 +131,12 @@ class Rule
         }
 
         $aliased     = $this->alias($targets);
-        $supported   = $aliased;
+        $supported   = new ArrayCollection;
         $unsupported = $aliased;
 
         // Find targets that match all conditions or none
         $passed = $this->getConditions()->forAll(function($i, $condition) use ($aliased, &$supported, &$unsupported) {
-            $supported = $aliased->filter(function($target) use ($condition, &$unsupported) {
+            $matches = $aliased->filter(function($target) use ($condition, &$unsupported) {
                 if ($condition->supports($target)) {
                     $unsupported->removeElement($target);
                 }
@@ -144,7 +144,11 @@ class Rule
                 return $condition->supports($target) && $condition->evaluate($target);
             });
 
-            return !$supported->isEmpty();
+            foreach ($matches as $match) {
+                $supported->add($match);
+            }
+
+            return !$matches->isEmpty();
         });
 
         if ($passed) {

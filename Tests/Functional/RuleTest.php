@@ -134,6 +134,17 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('New Store Name', $store->name);
     }
 
+    /**
+     * @dataProvider twoRuleProvider
+     */
+    public function testRuleSupportsAllPassingTargets($rule)
+    {
+        $person = new Person('Eric');
+        $store  = new Store('CodeMeme');
+
+        $this->assertEquals(2, count($rule->supports(array($person, $store))));
+    }
+
     public function ruleProvider()
     {
         $rule = new Rule(
@@ -153,6 +164,28 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule(
             array(new Behavior('person.name', new Equals('Eric'))),
             array(new Behavior('store.name', 'New Store Name')),
+            array(),
+            array(
+                'person' => 'CodeMeme\\RulesBundle\\Tests\\Model\\Person',
+                'store'  => 'CodeMeme\\RulesBundle\\Tests\\Model\\Store',
+            )
+        );
+
+        return array(
+            array($rule)
+        );
+    }
+
+    public function twoRuleProvider()
+    {
+        $rule = new Rule(
+            array(
+                new Behavior('person.name', new Equals('Eric')),
+                new Behavior('store.name', new Equals('CodeMeme'))
+            ),
+            array(
+                new Behavior('store.name', 'New Store Name')
+            ),
             array(),
             array(
                 'person' => 'CodeMeme\\RulesBundle\\Tests\\Model\\Person',
