@@ -101,7 +101,7 @@ class Rule
         if ($supported = $this->supports($targets)) {
             $this->modify($supported, $this->getActions());
         } else if (! $this->getFallbacks()->isEmpty()) {
-            $this->modify($targets, $this->getFallbacks());
+            $this->modify($this->alias($targets), $this->getFallbacks());
         }
         
         return (Boolean) $supported;
