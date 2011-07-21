@@ -132,7 +132,7 @@ class Rule
 
         $aliased     = $this->alias($targets);
         $supported   = new ArrayCollection;
-        $unsupported = $aliased;
+        $unsupported = new ArrayCollection($aliased->toArray());
 
         // Find targets that match all conditions or none
         $passed = $this->getConditions()->forAll(function($i, $condition) use ($aliased, &$supported, &$unsupported) {
