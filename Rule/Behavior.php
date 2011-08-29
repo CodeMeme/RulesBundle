@@ -37,6 +37,10 @@ class Behavior
             return false;
         }
 
+        if (null === $actual) {
+            return false;
+        }
+
         return $this->comparators->forAll(function($i, $comparator) use ($actual) {
             return $comparator->compare($actual);
         });
