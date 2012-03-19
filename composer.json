@@ -1,0 +1,17 @@
+{
+    "name": "ericclemmons/rules-bundle",
+    "description": "Configuration-based logic for your domain models",
+    "keywords": ["rules","logic","dynamic"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eric Clemmons",
+            "email": "eric@smarterspam.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "CodeMeme\\RulesBundle\\RulesBundle": "" }
+    },
+    "target-dir": "CodeMeme/RulesBundle/RulesBundle"
+}
