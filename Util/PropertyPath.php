@@ -21,9 +21,9 @@ class PropertyPath extends BasePropertyPath
      */
     protected function readProperty($object, $currentIndex)
     {
-        $property = $this->elements[$currentIndex];
-    
-        if ($this->isIndex[$currentIndex]) {
+        $property = $this->getElement($currentIndex);
+
+        if ($this->isIndex($currentIndex)) {
             if (!$object instanceof \ArrayAccess) {
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($object)));
             }
@@ -80,9 +80,9 @@ class PropertyPath extends BasePropertyPath
      */
     protected function writeProperty(&$objectOrArray, $currentIndex, $value)
     {
-        $property = $this->elements[$currentIndex];
-    
-        if (is_object($objectOrArray) && $this->isIndex[$currentIndex]) {
+        $property = $this->getElement($currentIndex);
+
+        if (is_object($objectOrArray) && $this->isIndex($currentIndex)) {
             if (!$objectOrArray instanceof \ArrayAccess) {
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($objectOrArray)));
             }
