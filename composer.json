@@ -20,7 +20,9 @@
 
     "autoload": {
         "psr-0": {
-            "CodeMeme\\RulesBundle\\RulesBundle": ""
+            "CodeMeme\\RulesBundle": ""
         }
     },
+
+    "target-dir": "CodeMeme/RulesBundle"
 }
