@@ -12,6 +12,14 @@
         
         <parameter key="rules.engine.class">CodeMeme\RulesBundle\RulesEngine</parameter>
         <parameter key="rules.rule.class">CodeMeme\RulesBundle\Rule</parameter>
+
+        <parameter key="rules.comparator.contains.class">CodeMeme\RulesBundle\Rule\Comparator\Contains</parameter>
+        <parameter key="rules.comparator.equals.class">CodeMeme\RulesBundle\Rule\Comparator\Equals</parameter>
+        <parameter key="rules.comparator.greater_than.class">CodeMeme\RulesBundle\Rule\Comparator\GreaterThan</parameter>
+        <parameter key="rules.comparator.in.class">CodeMeme\RulesBundle\Rule\Comparator\In</parameter>
+        <parameter key="rules.comparator.less_than.class">CodeMeme\RulesBundle\Rule\Comparator\LessThan</parameter>
+        <parameter key="rules.comparator.matches.class">CodeMeme\RulesBundle\Rule\Comparator\Matches</parameter>
+        <parameter key="rules.comparator.not.class">CodeMeme\RulesBundle\Rule\Comparator\Not</parameter>
     </parameters>
 
     <services>
@@ -25,6 +33,41 @@
         <service id="rules.rule"   class="%rules.rule.class%"   factory-service="rules.rule_factory"   factory-method="createRule"   abstract="true" />
         
         <service id="rules" alias="rules.engine" />
+
+        <!-- all rules-bundle comparators services -->
+        <!--
+             @todo use the Symfony2 finder component.
+             Like $finder->files()->in('Comparator')->filter(...implementsComparatorInterface());
+        -->
+        <service id="rules.comparator.contains" class="%rules.comparator.contains.class%">
+            <argument type="string" id="alias">Contains</argument>
+            <tag name="rules.comparator" />
+        </service>
+        <service id="rules.comparator.equals" class="%rules.comparator.equals.class%">
+            <argument type="string" id="alias">Equals</argument>
+            <tag name="rules.comparator" />
+        </service>
+        <service id="rules.comparator.greater_than" class="%rules.comparator.greater_than.class%">
+            <argument type="string" id="alias">GreaterThan</argument>
+            <tag name="rules.comparator" />
+        </service>
+        <service id="rules.comparator.in" class="%rules.comparator.in.class%">
+            <argument type="string" id="alias">In</argument>
+            <tag name="rules.comparator" />
+        </service>
+        <service id="rules.comparator.less_than" class="%rules.comparator.less_than.class%">
+            <argument type="string" id="alias">LessThan</argument>
+            <tag name="rules.comparator" />
+        </service>
+        <service id="rules.comparator.matches" class="%rules.comparator.matches.class%">
+            <argument type="string" id="alias">Matches</argument>
+            <tag name="rules.comparator" />
+        </service>
+        <service id="rules.comparator.not" class="%rules.comparator.not.class%">
+            <argument type="string" id="alias">Not</argument>
+            <tag name="rules.comparator" />
+        </service>
+
     </services>
 
 </container>
