@@ -41,7 +41,7 @@ class RuleFactory
         if ($fallbacks) {
             foreach ($fallbacks as $fallback => $values) {
                 $rule->getFallbacks()->add(
-                    $factory->createBehavior($fallback, $values)
+                    $this->behaviorFactory->createBehavior($fallback, $values)
                 );
             }
         }
