@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A smart and extendable rule engine bundle for symfony2 PHP project's
+Simple Symfony2 rules engine for business logic through configuration
 
 ## Requirements
 
@@ -20,7 +20,7 @@ A smart and extendable rule engine bundle for symfony2 PHP project's
     ```
 1.1 Run the composer installation. E.g.: composer install
 
-2. Register this bundle in your your *app/AppKernel.php*
+2. Register this bundle in your *app/AppKernel.php*
 
     ```php
     <?php
