@@ -10,6 +10,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 
+/**
+ * Behavior class, optimized for PropertyPath targets
+ */
 class Behavior
 {
 
