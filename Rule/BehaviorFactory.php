@@ -25,6 +25,7 @@ class BehaviorFactory
             }
         }
 
+        // @todo remove the very hard coupling to this single behavior mechanism
         return new Behavior($path, $comparators);
 
     }
