@@ -96,6 +96,13 @@ class Rule
         return $this;
     }
 
+    /**
+     * Evaluate this rule with given targets
+     *
+     * @api
+     * @param $targets
+     * @return bool
+     */
     public function evaluate($targets)
     {
         if ($supported = $this->supports($targets)) {
@@ -107,6 +114,12 @@ class Rule
         return (Boolean) $supported;
     }
 
+    /**
+     * Execute all registered and supported actions
+     *
+     * @param $targets
+     * @param $actions
+     */
     public function modify($targets, $actions)
     {
         foreach ($actions as $action) {
@@ -118,6 +131,13 @@ class Rule
         }
     }
 
+    /**
+     * Traverse and check over all registered conditions
+     *
+     * @param $targets
+     * @return bool|\Doctrine\Common\Collections\ArrayCollection
+     * @throws \InvalidArgumentException
+     */
     public function supports($targets)
     {
         if (!is_array($targets) && !$targets instanceof \IteratorAggregate) {

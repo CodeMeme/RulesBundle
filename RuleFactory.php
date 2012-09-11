@@ -6,13 +6,17 @@ use CodeMeme\RulesBundle\Rule\BehaviorFactory;
 
 class RuleFactory
 {
+    private $behaviorFactory;
+
+    public function __construct($behaviorFactory)
+    {
+        $this->behaviorFactory = $behaviorFactory;
+    }
 
     public function createRule($name, $conditions, $actions, $fallbacks = array())
     {
         $rule = new Rule;
         $rule->setName($name);
-        
-        $factory = new BehaviorFactory;
         
         if (! $conditions) {
             throw new \InvalidArgumentException('Rule conditions must be iterable');
@@ -20,7 +24,7 @@ class RuleFactory
         
         foreach ($conditions as $condition => $values) {
             $rule->getConditions()->add(
-                $factory->createBehavior($condition, $values)
+                $this->behaviorFactory->createBehavior($condition, $values)
             );
         }
         
@@ -30,14 +34,14 @@ class RuleFactory
         
         foreach ($actions as $action => $values) {
             $rule->getActions()->add(
-                $factory->createBehavior($action, $values)
+                $this->behaviorFactory->createBehavior($action, $values)
             );
         }
         
         if ($fallbacks) {
             foreach ($fallbacks as $fallback => $values) {
                 $rule->getFallbacks()->add(
-                    $factory->createBehavior($fallback, $values)
+                    $this->behaviorFactory->createBehavior($fallback, $values)
                 );
             }
         }
