@@ -92,6 +92,12 @@ class RulesEngine
         return $this;
     }
 
+    /**
+     * Evaluate the given targets by all configured rules
+     *
+     * @api
+     * @param array $targets
+     */
     public function evaluate($targets = array())
     {
         foreach ($this->getTargets() as $target) {
