@@ -24,21 +24,7 @@ class CodeMemeRulesExtension extends Extension
         
         $rules   = array();
         $aliases = array();
-
-        foreach ($container->findTaggedServiceIds('rules.comparator') as $id => $tags) {
-            $comparatorDefinition = $container->findDefinition($id);
-            $definition = $container->getDefinition('rules.behavior_factory');
-            $comparatorName = $id;
-
-            // overwrite the id with an alias if given.
-            $args = $comparatorDefinition->getArguments();
-            if (count($args) > 0) {
-                $comparatorName = $args[0];
-            }
-
-            $definition->addMethodCall('addComparatorClass', array($comparatorName, $comparatorDefinition->getClass()));
-        }
-
+        
         foreach ($configs as $config) {
             if (isset($config['aliases'])) {
                 $aliases += $config['aliases'];
