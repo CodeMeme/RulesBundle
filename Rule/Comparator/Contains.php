@@ -4,7 +4,6 @@ namespace CodeMeme\RulesBundle\Rule\Comparator;
 
 class Contains extends AbstractComparator
 {
-
     public function compare($actual)
     {
         if (is_array($actual) || $actual instanceof \IteratorAggregate) {
@@ -13,10 +12,10 @@ class Contains extends AbstractComparator
                     return true;
                 }
             }
+
             return false;
         }
 
         return stripos($actual, $this->expected) !== false;
     }
-
 }
