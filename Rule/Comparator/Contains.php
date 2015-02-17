@@ -8,7 +8,7 @@ class Contains extends AbstractComparator
     {
         if (is_array($actual) || $actual instanceof \IteratorAggregate) {
             foreach ($actual as $value) {
-                if ($this->expected == (string) $value) {
+                if (stripos((string) $value, $this->expected) !== false) {
                     return true;
                 }
             }
